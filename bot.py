@@ -33,8 +33,8 @@ logger = logging.getLogger("SherzodbekAI")
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 
-API_ID = int(os.getenv("API_ID", "31464913"))
-API_HASH = os.getenv("API_HASH", "d3e89942a4cf0255fab365e2498d91e0").strip()
+API_ID = int(os.getenv("API_ID", "0"))
+API_HASH = os.getenv("API_HASH", "").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 PRIMARY_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip()
 FALLBACK_MODEL = "gemini-flash-latest"
@@ -437,18 +437,19 @@ async def keep_alive_pinger():
 
 
 async def start_web_server():
-    """Cloud hosting (Render / Koyeb) uchun HTTP port ochish."""
+    """Cloud hosting (Alwaysdata / Render / Koyeb) uchun HTTP port ochish."""
     port_str = os.getenv("PORT", "")
     if not port_str:
         return
+    host_ip = os.getenv("IP", "0.0.0.0")
     app = web.Application()
     app.router.add_get("/", health_handler)
     app.router.add_get("/health", health_handler)
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", int(port_str))
+    site = web.TCPSite(runner, host_ip, int(port_str))
     await site.start()
-    logger.info(f"24/7 Web Server {port_str}-portda ishga tushdi.")
+    logger.info(f"24/7 Web Server {host_ip}:{port_str} da ishga tushdi.")
     asyncio.create_task(keep_alive_pinger())
 
 
